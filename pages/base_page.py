@@ -28,12 +28,18 @@ class BasePage(object):
         element = self.find(*locator)
         element.send_keys(text + Keys.RETURN)
 
-    def wait_click(self, locator_type, locator_value, timeout):
-        try:
-            # Maksimum belirtilen süre kadar bekler
-            element = WebDriverWait(self.driver, timeout).until(
-                EC.element_to_be_clickable((locator_type, locator_value))
-            )
-            element.click()
-        except Exception as e:
-            print(f"Bir hata oluştu: {e}")
+    def find_and_click(self, locator_type, locator_value, timeout, max_retries):
+        retries = 0
+        while retries < max_retries:
+            try:
+                element = WebDriverWait(self.driver, timeout).until(
+                    EC.element_to_be_clickable((locator_type, locator_value))
+                )
+                element.click()
+                return True
+            except Exception as e:
+                print(f"Bir hata oluştu: {e}. Sayfa yenileniyor")
+                retries += 1
+                self.driver.refresh()
+        print(f"Element {locator_value} locater'ı {max_retries} denemeden sonra bulunamadı veya tıklanamadı")
+        return False
