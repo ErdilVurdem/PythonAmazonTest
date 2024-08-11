@@ -5,7 +5,7 @@ from pages.base_page import BasePage
 
 class ProductPage(BasePage):
     PRODUCT_NAME = (By.ID, "titleSection")
-    ADD_TO_CART_BUTTON = (By.ID, "add-to-cart-button")
+    addToCartButtonLocaterValue = "#add-to-cart-button"
 
     def is_product_present(self):
         try:
@@ -15,4 +15,4 @@ class ProductPage(BasePage):
             return False
 
     def click_add_to_cart_button(self):
-        self.click_element(*self.ADD_TO_CART_BUTTON)
+        self.find_and_click(By.CSS_SELECTOR, self.addToCartButtonLocaterValue, 10, 3)

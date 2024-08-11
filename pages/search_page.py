@@ -3,7 +3,7 @@ from pages.base_page import BasePage
 
 
 class SearchPage(BasePage):
-    FIRST_ELEMENT = (By.XPATH, "//div[1]/div[1]/div/span[1]/div[1]/div[3]//div[2]/div[2]")
+    FIRST_ELEMENT = (By.XPATH, "(//*[@class='a-size-mini a-spacing-none a-color-base s-line-clamp-4'])[1]")
     SECOND_PAGE = (By.CSS_SELECTOR, ".s-pagination-item.s-pagination-button:first-of-type")
     productToClickLocatorValue = "[data-index='26']"
 
