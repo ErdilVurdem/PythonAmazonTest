@@ -1,3 +1,4 @@
+from selenium.common import NoSuchElementException
 from selenium.webdriver import ActionChains, Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -28,18 +29,38 @@ class BasePage(object):
         element = self.find(*locator)
         element.send_keys(text + Keys.RETURN)
 
-    def find_and_click(self, locator_type, locator_value, timeout, max_retries):
-        retries = 0
-        while retries < max_retries:
+    def find_and_click(self, locator_type, locator_value, timeout, backup_locator_type, backup_locater_value):
+        try:
+            element = WebDriverWait(self.driver, timeout).until(
+                EC.element_to_be_clickable((locator_type, locator_value))
+            )
+            element.click()
+            return True
+        except Exception as e:
             try:
+                element = WebDriverWait(self.driver, timeout).until(
+                    EC.presence_of_element_located((backup_locator_type, backup_locater_value))
+                )  # ürününe tıklanamadıysa yedek locate ile ürüne tıklanır
+                element.click()
                 element = WebDriverWait(self.driver, timeout).until(
                     EC.element_to_be_clickable((locator_type, locator_value))
                 )
                 element.click()
-                return True
-            except Exception as e:
-                print(f"Bir hata oluştu: {e}. Sayfa yenileniyor")
-                retries += 1
-                self.driver.refresh()
-        print(f"Element {locator_value} locater'ı {max_retries} denemeden sonra bulunamadı veya tıklanamadı")
-        return False
+            except NoSuchElementException:
+                print("Yedek locate de bulunamadı")
+
+    def find_and_click_with_backup(self, locator_type, locator_value, wait_time, backup_locator_type,
+                                   backup_locator_value):
+        try:
+            element = WebDriverWait(self.driver, wait_time).until(
+                EC.presence_of_element_located((locator_type, locator_value))
+            )
+            element.click()
+        except NoSuchElementException:
+            try:
+                element = WebDriverWait(self.driver, wait_time).until(
+                    EC.presence_of_element_located((backup_locator_type, backup_locator_value))
+                )
+                element.click()
+            except NoSuchElementException:
+                print("Yedek locate de bulunamadı")
